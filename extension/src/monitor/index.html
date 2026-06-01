@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>OptionPilot Monitor</title>
+    <style>
+      :root { color-scheme: light dark; }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0; padding: 20px; max-width: 900px; margin-inline: auto;
+        font-family: system-ui, -apple-system, sans-serif; font-size: 14px;
+        background: #fff; color: #111;
+      }
+      @media (prefers-color-scheme: dark) {
+        body { background: #0a0a0a; color: #eaeaea; }
+        .card { background: #161616; border-color: #2a2a2a !important; }
+        .data { background: #0d0d0d; border-color: #222; }
+      }
+      h1 { font-size: 18px; margin: 0; }
+      .topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+      .muted { color: #888; }
+      .row { display: flex; gap: 10px; align-items: center; }
+      button { padding: 8px 14px; border-radius: 8px; border: 1px solid #ccc; background: transparent; color: inherit; cursor: pointer; font-weight: 600; }
+      button.primary { background: #2563eb; color: #fff; border-color: #2563eb; }
+      button:disabled { opacity: .5; }
+      .card { border: 1px solid #e5e5e5; border-radius: 10px; padding: 12px 14px; margin: 12px 0; }
+      .group-title { font-weight: 700; font-size: 13px; letter-spacing: .03em; margin-bottom: 6px; }
+      .job { display: flex; align-items: flex-start; gap: 9px; padding: 5px 0; border-top: 1px solid rgba(128,128,128,.12); }
+      .job:first-of-type { border-top: none; }
+      .dot { width: 10px; height: 10px; border-radius: 50%; margin-top: 5px; flex: 0 0 auto; }
+      .src { font-weight: 600; }
+      .sub { color: #888; font-size: 13px; word-break: break-word; }
+      .err { color: #dc2626; font-size: 13px; }
+      .pill { font-size: 12px; padding: 2px 8px; border-radius: 999px; background: #eee; color: #333; }
+      @media (prefers-color-scheme: dark) { .pill { background: #222; color: #ccc; } }
+      /* The panel repaints once a second during a countdown, so a 1s spin that
+         restarts each repaint reads as a continuous rotation; the glyph also
+         swaps per tick as a fallback. */
+      .countdown { animation: countdown-pulse 1s ease-in-out infinite; }
+      .countdown-clock { display: inline-block; animation: spin 1s linear infinite; }
+      @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+      @keyframes countdown-pulse { 0%, 100% { opacity: 1; } 50% { opacity: .6; } }
+      @media (prefers-reduced-motion: reduce) {
+        .countdown, .countdown-clock { animation: none; }
+      }
+      .summary-bar { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0; }
+      .data { background: #f6f6f6; border: 1px solid #eee; border-radius: 6px; padding: 8px; font-size: 11px; overflow-x: auto; max-height: 240px; margin: 6px 0 0; }
+      .toast { color: #16a34a; font-size: 13px; }
+    </style>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="./main.ts"></script>
+  </body>
+</html>

@@ -1,0 +1,26 @@
+{
+  "name": "@optionpilot/harness",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Extension-less scraper: drives the same parser contracts headlessly via Playwright and writes to Supabase.",
+  "scripts": {
+    "scrape": "tsx run.mts",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@optionpilot/contracts": "file:../contracts",
+    "@supabase/supabase-js": "^2.106.2",
+    "dotenv": "^17.4.2",
+    "jsdom": "^29.1.1",
+    "playwright": "^1.60.0"
+  },
+  "devDependencies": {
+    "@types/jsdom": "^28.0.3",
+    "@types/node": "^25.9.1",
+    "tsx": "^4.22.4",
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.7"
+  }
+}

@@ -1,0 +1,77 @@
+---
+description: Every new feature must instrument the Diagnostics system so failures are self-describing when copied to Cursor.
+globs: extension/src/**/*.ts
+alwaysApply: false
+---
+
+# Diagnostics-First Development
+
+Every feature must be fully observable through the existing `Diagnostics` system so that a single "Copy diagnostics" blob is enough context to diagnose and fix any failure.
+
+## Rule: Instrument all meaningful states
+
+For every new code path, call the appropriate helper from `extension/src/background/diagnostics.ts`:
+
+| Situation | Call |
+|---|---|
+| New per-symbol/source job starts | `seedJob(source, symbol, url)` |
+| Job state changes | `updateJob(source, symbol, { status, message?, dataSummary?, data?, debug? })` |
+| Unrecoverable / unexpected error | `addError(where, message)` — `where` = function/feature name |
+| New top-level settings or config loaded | `setMeta({ settings })` |
+| New Realtime subscription added | mirror `setScrapeRequestsWatching` / `setAnalysisRequestsWatching` pattern |
+
+## Rule: `debug` must capture the decision inputs
+
+When a scrape or parse produces a wrong result (empty, stale, misparse), the root cause is almost always the DOM state or raw API response at that moment. Always attach a `debug` object to `updateJob`:
+
+```typescript
+// ❌ BAD — impossible to diagnose from a copy
+updateJob(source, symbol, { status: "empty" });
+
+// ✅ GOOD — debug tells you exactly what the selector saw
+updateJob(source, symbol, {
+  status: "empty",
+  message: "bid selector returned null",
+  debug: {
+    selectorTried: ".bid-price",
+    outerHTML: el?.outerHTML ?? null,
+    pageTitle: document.title,
+    url: location.href,
+  },
+});
+```
+
+## Rule: `message` must be a complete sentence
+
+`message` and the `where`/`message` pair in `addError` are shown verbatim in the copy blob. Write them so they are actionable without reading code:
+
+```typescript
+// ❌ BAD
+addError("scrape", "failed");
+
+// ✅ GOOD
+addError("scrapeCore.persistWrite", `Supabase upsert rejected: ${err.message} (code ${err.code})`);
+```
+
+## Rule: `dataSummary` for every successful scrape
+
+Successful jobs should include a one-line human summary so it's easy to confirm the right data was captured:
+
+```typescript
+updateJob(source, symbol, {
+  status: "scraped",
+  dataSummary: `bid=${write.bid} ask=${write.ask} iv=${write.iv} rows=${write.chains?.length ?? 0}`,
+  data: write,
+});
+```
+
+## Rule: New request-trigger paths get their own `RequestsIndicator`
+
+If you add a new Supabase Realtime subscription (a new table trigger), follow the `scrapeRequests` / `analysisRequests` pattern in `diagnostics.ts`:
+- Add a typed indicator to `Diagnostics` in `contracts/src/diagnostics.ts`
+- Track `watching`, `subStatus`, `received`, `lastEventAt`, `lastRequestId`, `lastCheckedAt`
+- Include it in `formatDiagnostics` so it appears in the copy blob
+
+## What the copy blob must answer
+
+Before shipping a feature ask: "If this silently fails at 3 AM, can I paste the diagnostics blob here and immediately know **what** ran, **what** it saw, and **why** it stopped?" If the answer is no, add more instrumentation.

@@ -1,0 +1,63 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light dark;
+}
+
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    @apply bg-app text-neutral-900 dark:text-neutral-100;
+    /* Subtle radial glow behind the viewport on both themes. */
+    background-image:
+      radial-gradient(
+        80rem 40rem at 50% -10rem,
+        rgba(99, 102, 241, 0.08),
+        transparent 60%
+      ),
+      radial-gradient(
+        60rem 30rem at 110% 110%,
+        rgba(16, 185, 129, 0.05),
+        transparent 60%
+      );
+  }
+
+  *:focus-visible {
+    @apply outline-none ring-2 ring-brand-500/60 ring-offset-2 ring-offset-app;
+    border-radius: inherit;
+  }
+
+  /* Hide number-input spinners; they're noisy in our currency fields. */
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  input[type="number"] {
+    -moz-appearance: textfield;
+  }
+}
+
+@layer utilities {
+  .bg-app {
+    @apply bg-neutral-50 dark:bg-neutral-950;
+  }
+  .ring-offset-app {
+    --tw-ring-offset-color: theme("colors.neutral.50");
+  }
+  .dark .ring-offset-app {
+    --tw-ring-offset-color: theme("colors.neutral.950");
+  }
+
+  /* Tabular numerals for any monetary/numeric display. */
+  .num {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum";
+  }
+}
