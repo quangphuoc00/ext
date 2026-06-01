@@ -7,6 +7,9 @@ out/
 next-env.d.ts
 .vercel
 
+# TypeScript incremental build cache - regenerated on each build
+*.tsbuildinfo
+
 # Local dev secrets - never commit
 .dev-credentials.local.md
 *.local.md
